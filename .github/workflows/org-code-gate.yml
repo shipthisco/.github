@@ -1,0 +1,38 @@
+name: Org Code Gate
+
+on:
+  workflow_call:
+    inputs:
+      gate-ref:
+        type: string
+        default: main
+
+permissions:
+  contents: read
+
+jobs:
+  gate:
+    name: Org code gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/checkout@v4
+        with:
+          repository: shipthisco/.github
+          ref: ${{ inputs.gate-ref }}
+          path: .org-gate
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      - name: Check added lines against the org rules
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+          BASE_REF: ${{ github.base_ref }}
+        run: |
+          git fetch --no-tags origin "+refs/heads/$BASE_REF:refs/remotes/origin/$BASE_REF"
+          python .org-gate/scripts/org_gate.py "$(git merge-base "origin/$BASE_REF" HEAD)"
