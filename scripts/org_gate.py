@@ -61,7 +61,7 @@ def main():
             problems.append(f"{path}: {len(comments)} of {len(lines)} added lines are comments — comment only what the code cannot say")
 
     tracked = set(git("ls-files").splitlines())
-    paths = tracked | {os.path.dirname(path) + "/" for path in tracked}
+    paths = tracked | {"/".join(path.split("/")[:i]) + "/" for path in tracked for i in range(1, path.count("/") + 1)}
     for token in sorted(set(re.findall(r"`([^`\s]+)`", open("CLAUDE.md").read()))):
         # Branch prefixes (feature/), placeholders (<name>, YYYY), globs, path aliases (@/) and sibling repos (../) are not repo paths.
         if re.search(r"[<*]|YYYY|^@|^\.\./", token) or re.fullmatch(r"[\w-]+/", token) or not ("/" in token or re.search(r"\.(py|ts|go|ya?ml|md|json|sh)$", token)):
