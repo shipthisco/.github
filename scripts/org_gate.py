@@ -63,8 +63,8 @@ def main():
     tracked = set(git("ls-files").splitlines())
     paths = tracked | {"/".join(path.split("/")[:i]) + "/" for path in tracked for i in range(1, path.count("/") + 1)}
     for token in sorted(set(re.findall(r"`([^`\s]+)`", open("CLAUDE.md").read()))):
-        # Branch prefixes (feature/), placeholders (<name>, YYYY), globs, path aliases (@/) and sibling repos (../) are not repo paths.
-        if re.search(r"[<*]|YYYY|^@|^\.\./", token) or re.fullmatch(r"[\w-]+/", token) or not ("/" in token or re.search(r"\.(py|ts|go|ya?ml|md|json|sh)$", token)):
+        # Branch prefixes (feature/), placeholders (<name>, {lang}, YYYY), templates (${...}), URL paths (/api/), globs, path aliases (@/) and sibling repos (../) are not repo paths.
+        if re.search(r"[<*${]|YYYY|^@|^/|^\.\./", token) or re.fullmatch(r"[\w-]+/", token) or not ("/" in token or re.search(r"\.(py|ts|go|ya?ml|md|json|sh)$", token)):
             continue
         if not any(path == token or path.endswith("/" + token) for path in paths):
             problems.append(f"CLAUDE.md names {token}, which does not exist in the repo")
