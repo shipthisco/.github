@@ -1,11 +1,8 @@
 name: Org Code Gate
 
 on:
-  workflow_call:
-    inputs:
-      gate-ref:
-        type: string
-        default: main
+  pull_request:
+    types: [opened, synchronize, reopened, edited]
 
 permissions:
   contents: read
@@ -22,7 +19,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           repository: shipthisco/.github
-          ref: ${{ inputs.gate-ref }}
+          ref: main
           path: .org-gate
 
       - uses: actions/setup-python@v5
