@@ -1,0 +1,29 @@
+name: Sherlock Review
+
+on:
+  workflow_call:
+    inputs:
+      runs-on:
+        type: string
+        default: ubuntu-latest
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  review:
+    name: SherlockQA Review
+    # Dependabot PRs get no Actions secrets, so the review could only fail there.
+    if: github.actor != 'dependabot[bot]'
+    runs-on: ${{ inputs.runs-on }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: mayurrawte/SherlockQA@v1.4.0
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          ai-provider: bedrock
+          bedrock-api-key: ${{ secrets.BEDROCK_API_KEY }}
+          aws-region: us-east-1
+          model: us.anthropic.claude-sonnet-4-6
