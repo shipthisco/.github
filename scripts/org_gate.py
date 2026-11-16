@@ -45,7 +45,7 @@ def main():
     problems = []
 
     body = [line for line in re.sub(r"<!--.*?-->", "", os.environ.get("PR_BODY", ""), flags=re.S).splitlines() if line.strip()]
-    if len(body) > 2:
+    if len(body) > 2 and os.environ.get("GITHUB_ACTOR") != "dependabot[bot]":
         problems.append(f"PR description is {len(body)} lines; keep it to two (why it changed, how it was verified)")
 
     for path, lines in added_lines(sys.argv[1]).items():
